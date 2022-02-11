@@ -1,15 +1,11 @@
-from django.shortcuts import render
-from django.http import HttpResponse
-from rango.models import Category
-from rango.models import Page
-from rango.forms import CategoryForm, PageForm, UserForm, UserProfileForm
-from django.shortcuts import redirect
-from django.contrib.auth import authenticate, login, logout
+from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.urls import reverse
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from rango.models import Category, Page
+from rango.forms import CategoryForm, PageForm, UserForm, UserProfileForm
 from datetime import datetime
-
 
 def index(request):
 
@@ -30,16 +26,20 @@ def index(request):
     context_dict['pages'] = pages_list
 
     visitor_cookie_handler(request)
-    context_dict['visits'] = request.session['visits']
 
+    response = render(request, 'rango/index.html', context=context_dict)
     # Return a rendered response to send to the client.
     # We make use of the shortcut function to make our lives easier.
     # Note that the first parameter is the template we wish to use.
-    return render(request, 'rango/index.html', context=context_dict)
+    return response
 
 
 def about(request):
-    return render(request, 'rango/about.html')
+    context_dict = {}
+    visitor_cookie_handler(request)
+    context_dict['visits'] = request.session['visits']
+
+    return render(request, 'rango/about.html', context=context_dict)
 
 
 def show_category(request, category_name_slug):
